@@ -123,6 +123,13 @@ const details = {
     description: "Analyzes a given memory text, providing word count, character count, and sentiment analysis."
 };
 ```
+## Sample Prompts and Results
+
+Sample prompt: 
+analyze this: a dog went to the park
+
+Sample output: 
+"Final result: \"The memory you provided contains 6 words and 22 characters, and it conveys a neutral sentiment.\""
 
 ## Limitations and Potential Improvements
 
@@ -139,4 +146,6 @@ Potential improvements could include:
 ## Conclusion
 
 This text analysis function provides a simple yet effective way to extract basic metrics and sentiment from text. When used in conjunction with AI models like GPT, it can enable more complex text processing and analysis tasks.
+
+<img width="1440" alt="Screen Shot 2024-10-17 at 3 33 11 PM" src="https://github.com/user-attachments/assets/2f091a36-261f-4bd7-8cd9-7fe49c1f39e1">
 
