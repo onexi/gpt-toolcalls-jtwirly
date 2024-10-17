@@ -28,34 +28,114 @@ We've added the following new features:
 1. **Memory Analysis**: The `analyzeMemory` function can now provide word count, character count, and sentiment analysis for a given memory.
 2. **Multi-step Function Calling**: The system can now chain multiple function calls together, allowing for more complex operations.
 
-## How to Use
+# Text Analysis Function
 
-1. Start the server by running `node server.js`.
-2. Open a web browser and navigate to `http://localhost:3000`.
-3. Use the interface to interact with the AI. Here are some example prompts:
+This project demonstrates a simple yet powerful text analysis function that can analyze given text for various metrics and sentiment. It's designed to work with OpenAI's GPT model as a tool for more complex AI interactions.
 
-   - "Store this memory: I had a great day at the park today."
-   - "Retrieve the memory about the park."
-   - "Analyze the memory about the park."
+## Overview
 
-4. The AI will interpret your request, call the appropriate functions, and return the results.
+The `analyzeMemory` function is capable of:
+1. Counting the number of words in a text
+2. Counting the total number of characters in a text
+3. Performing basic sentiment analysis on the text
 
-## Function Calling Process
+## How It Works
 
-1. The user's message is sent to the OpenAI API along with the available functions.
-2. The AI model decides which function(s) to call based on the user's request.
-3. The server executes the called function(s) and sends the results back to the AI.
-4. This process can repeat up to 3 times per request, allowing for multi-step operations.
-5. The final result is returned to the user.
+### Word and Character Count
 
-## Extending the System
+The function uses simple JavaScript string methods to analyze the text:
 
-To add new functionality:
+- Word count is determined by splitting the text on whitespace (`text.split(/\s+/).length`).
+- Character count is simply the length of the string (`text.length`).
 
-1. Create a new JavaScript file in the `functions` directory.
-2. Export an `execute` function and a `details` object describing the function.
-3. The new function will automatically be available to the AI for use.
+### Sentiment Analysis
 
-## Note
+The sentiment analysis is performed using a basic keyword matching approach:
 
-This system is a demonstration and uses a simple CSV file for storage. In a production environment, you would want to use a more robust database system.
+1. The text is converted to lowercase and split into individual words.
+2. Each word is compared against predefined lists of positive and negative words.
+3. A score is calculated by incrementing for positive words and decrementing for negative words.
+4. The final sentiment is determined based on the overall score:
+   - Positive if the score is greater than 0
+   - Negative if the score is less than 0
+   - Neutral if the score is 0
+
+### Function Structure
+
+The `execute` function is the main entry point:
+
+```javascript
+const execute = async (memory) => {
+    const wordCount = memory.split(/\s+/).length;
+    const charCount = memory.length;
+    const sentiment = analyzeSentiment(memory);
+
+    return {
+        wordCount,
+        charCount,
+        sentiment,
+        summary: `The memory contains ${wordCount} words and ${charCount} characters. The overall sentiment is ${sentiment}.`
+    };
+};
+```
+
+The `analyzeSentiment` helper function performs the sentiment analysis:
+
+```javascript
+function analyzeSentiment(text) {
+    const positiveWords = ['happy', 'good', 'great', 'excellent', 'wonderful', 'love'];
+    const negativeWords = ['sad', 'bad', 'terrible', 'awful', 'hate', 'dislike'];
+
+    const words = text.toLowerCase().split(/\s+/);
+    let score = 0;
+
+    words.forEach(word => {
+        if (positiveWords.includes(word)) score++;
+        if (negativeWords.includes(word)) score--;
+    });
+
+    if (score > 0) return 'positive';
+    if (score < 0) return 'negative';
+    return 'neutral';
+}
+```
+
+## Usage with OpenAI API
+
+The function is designed to be used as a tool with OpenAI's GPT models. The `details` object provides the necessary metadata for the OpenAI API to understand how to use this function:
+
+```javascript
+const details = {
+    type: "function",
+    function: {
+        name: "analyzeMemory",
+        parameters: {
+            type: "object",
+            properties: {
+                memory: {
+                    type: "string",
+                    description: "The memory text to analyze"
+                }
+            },
+            required: ["memory"]
+        }
+    },
+    description: "Analyzes a given memory text, providing word count, character count, and sentiment analysis."
+};
+```
+
+## Limitations and Potential Improvements
+
+1. The sentiment analysis is very basic and may not capture nuanced or context-dependent sentiments.
+2. The lists of positive and negative words are limited and may not cover all scenarios.
+3. The function doesn't handle edge cases like empty strings or very long texts.
+
+Potential improvements could include:
+- Using a more sophisticated sentiment analysis library
+- Expanding the lists of positive and negative words
+- Adding error handling for edge cases
+- Implementing more advanced text analysis features like keyword extraction or topic modeling
+
+## Conclusion
+
+This text analysis function provides a simple yet effective way to extract basic metrics and sentiment from text. When used in conjunction with AI models like GPT, it can enable more complex text processing and analysis tasks.
